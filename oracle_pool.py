@@ -2,21 +2,31 @@
 
 # vim: ai ts=4 sts=4 et sw=4
 
-# This pooling server is there to keep db connections for django alive, because doesn't do
-# it and there is nothing like pgpool for oracle freely available.
-# The connections can't be held in the django application directly, because all the app
-# code is only run on a request basis. It would be necessary to change django's manage.py
-# but we don't want to do that.
-# Finally, the decision for pyro was made after a recommendation by Dietz.
+# Copyright (C) 2007-2009 Music Pictures Ltd.
+# Authors for this file:
+#                       Stefan Bethge <stefan@musicpictures.com>
+#                       Simon Redfern <simon@musicpictures.com>
 
-# Copyright: Music Pictures Ltd 2007, 2008. 
-# Author: Stefan Bethge, Simon Redfern
+## This program is free software; you can redistribute it and/or modify
+## it under the terms of the GNU Lesser General Public License as published
+## by the Free Software Foundation; version 3 or newer.
+##
+## This program is distributed in the hope that it will be useful,
+## but WITHOUT ANY WARRANTY; without even the implied warranty of
+## MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
+## GNU Lesser General Public License for more details. 
 
 import Pyro.core
 import signal
 import cx_Oracle
 import time
-from util.uuid import *
+
+try:
+    import uuid
+except:
+    #python < 2.5
+    from util.uuid import *
+
 from oracle_pool_procedures import *
 import logging as log
 
