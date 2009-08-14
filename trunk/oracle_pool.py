@@ -17,7 +17,6 @@
 ## GNU Lesser General Public License for more details. 
 
 import Pyro.core
-import signal
 import cx_Oracle
 import time
 
@@ -34,6 +33,9 @@ import os
 os.environ['NLS_LANG'] = '.UTF8'
 os.environ['DJANGO_SETTINGS_MODULE']='settings'
 
+if os.name != 'nt':
+    import signal
+
 from django.conf import settings
 from django.utils.encoding import smart_str, force_unicode
 
@@ -41,7 +43,7 @@ log.basicConfig(
     level=log.INFO,
     format='%(asctime)s %(levelname)-8s %(message)s',
     datefmt='%m-%d %H:%M',
-    filename='/var/log/calypso/oracle_pool_dev.log', 
+    filename='/var/log/pyorapool.log',     
     filemode='a'
 )
 
@@ -459,10 +461,11 @@ def onSignal(signum, stackframe):                 # handler for kill signals
         c.close()
     daemon.shutdown()
 
-signal.signal(1, onSignal) 
-signal.signal(2, onSignal) 
-signal.signal(3, onSignal) 
-signal.signal(15, onSignal) 
+if os.name != 'nt':
+    signal.signal(1, onSignal) 
+    signal.signal(2, onSignal) 
+    signal.signal(3, onSignal) 
+    signal.signal(15, onSignal) 
 
 try:
     daemon.requestLoop(callback=handle_connections)
